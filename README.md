@@ -15,6 +15,7 @@ rollups** que recalcula el patrimonio neto en tiempo real, **7 botones de alta r
 | **[ESQUEMA.md](ESQUEMA.md)** | Tabla de referencia rápida: todas las propiedades de las 8 BD, con tipo exacto y configuración. |
 | **[FORMULAS.md](FORMULAS.md)** | Anexo con las 41 fórmulas de Notion 2.0 listas para copiar y pegar. |
 | **[DATOS-DE-PRUEBA.md](DATOS-DE-PRUEBA.md)** | Juego de datos semilla que reproduce exactamente los números del diseño original + checklist de verificación. |
+| **[IDS-NOTION.md](IDS-NOTION.md)** | Mapa de IDs de la instancia ya construida en Notion + limitaciones reales de la API de Notion verificadas durante el montaje. |
 
 ---
 
