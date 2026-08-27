@@ -108,7 +108,7 @@ Además del manual de Notion, este repositorio aloja agentes a nivel de proyecto
 
 ### Spreadsheet Systems Architect
 
-Modelo: **Opus** · Definición: [`.claude/agents/spreadsheet-systems-architect.md`](.claude/agents/spreadsheet-systems-architect.md)
+Modelo: **Opus** · Esfuerzo: **`xhigh` (UltraCode)** · Definición: [`.claude/agents/spreadsheet-systems-architect.md`](.claude/agents/spreadsheet-systems-architect.md)
 
 Especialista en **Reverse Engineering, Spreadsheet Engineering, Automation,
 Visual Reconstruction y Functional QA** para Excel y Google Sheets. Analiza una
@@ -133,6 +133,25 @@ terminada.
 ```
 
 Claude Code también lo selecciona solo cuando la tarea encaja con su descripción.
+
+**Sobre el esfuerzo UltraCode**
+
+El agente declara `effort: xhigh` en su frontmatter, que es el nivel de
+razonamiento que UltraCode envía al modelo, y lo aplica solo mientras el agente
+está activo. `ultracode` no es un valor válido del campo `effort`: es un ajuste
+de sesión que suma a `xhigh` la orquestación automática de workflows dinámicos.
+Para tenerlo completo, actívalo en la sesión desde la que invocas al agente:
+
+```
+/effort ultracode          # toda la sesión
+claude --effort ultracode  # desde el arranque
+ultracode: <tu tarea>      # solo para esa tarea
+```
+
+Requiere un modelo con soporte de `xhigh` (Opus 5 / Opus 4.8), que es el caso de
+este agente. El propio prompt del agente incluye además la pauta de fan-out por
+hoja, por familia de fórmulas y por caso de prueba, que es la mitad de
+orquestación de UltraCode aplicada a hojas de cálculo.
 
 > 💡 Encaja de forma natural con este repositorio: es la contraparte en hoja de
 > cálculo del sistema de finanzas de Notion — exportar, auditar o replicar en
