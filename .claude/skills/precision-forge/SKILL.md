@@ -16,6 +16,7 @@ description: >-
   filled block are exactly where silent errors enter. Trigger on: build a
   spreadsheet, fix my Excel, audit these formulas, why is this total wrong,
   check this workbook, validate this model.
+model: opus
 effort: xhigh
 ---
 
