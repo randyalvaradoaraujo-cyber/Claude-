@@ -156,3 +156,60 @@ orquestación de UltraCode aplicada a hojas de cálculo.
 > 💡 Encaja de forma natural con este repositorio: es la contraparte en hoja de
 > cálculo del sistema de finanzas de Notion — exportar, auditar o replicar en
 > Excel/Sheets los mismos saldos, presupuestos y patrimonio neto.
+
+---
+
+## 🛠️ Skills de Claude Code en este repositorio
+
+### Precision Forge
+
+Esfuerzo: **`xhigh`** · Definición: [`.claude/skills/precision-forge/`](.claude/skills/precision-forge/)
+
+Skill de precisión quirúrgica para construir, reparar y auditar hojas de cálculo
+avanzadas de Excel. No revisa el trabajo al final: interpone un auditor mecánico
+entre cada bloque que se escribe y el siguiente, de modo que ningún defecto viaje
+más de una porción desde donde se introdujo.
+
+**El ciclo — seis puertas, cada una con feedback inmediato**
+
+| Puerta | Qué hace |
+|---|---|
+| 0 · Memoria | Lee el historial del proyecto: qué ha fallado antes, ordenado por frecuencia |
+| 1 · Validación de entrada | Tipos, claves, completitud y rango de los datos fuente |
+| 2 · Construcción por porciones | Auditoría estática tras cada bloque; bloquea si hay hallazgos graves |
+| 3 · Prueba numérica | Recalcula cada fórmula en Python puro y detecta valores obsoletos |
+| 4 · Golden test | Compara contra los valores que tú afirmas, derivados aparte |
+| 5 · Presentación | Barrido final: anchos, formatos, impresión, protección |
+| 6 · Cierre | Registra los hallazgos para que la próxima construcción empiece mejor |
+
+**Herramientas**
+
+- `scripts/audit.py` — 21 comprobaciones estáticas. La más incisiva normaliza
+  cada fórmula a forma relativa (R1C1), de modo que las celdas rellenadas desde
+  una misma fórmula colapsan en la misma cadena y la que se editó a mano queda
+  al descubierto. Devuelve código de salida para encadenarlo en un bucle de
+  construcción.
+- `scripts/recalc.py` — motor de cálculo en Python puro: no necesita Excel ni
+  LibreOffice. Detecta fórmulas que evalúan a error, valores guardados que ya no
+  coinciden con su propia fórmula, y desvíos contra expectativas declaradas.
+- `scripts/ledger.py` — la capa que aprende.
+
+**Cómo aprende**
+
+Un archivo de skill es texto estático y no puede reescribirse a sí mismo. El
+aprendizaje vive en `.precision-forge/ledger.json`, que el auditor lee en cada
+ejecución, y es real en tres sentidos verificables: **prioriza** (los hallazgos
+acumulan cuenta y ordenan la lista de vigilancia), **suprime** (un falso
+positivo silenciado con su motivo no vuelve a saltar, entre sesiones) y
+**extiende** (se pueden añadir comprobaciones nuevas que corren junto al
+catálogo de fábrica desde la siguiente auditoría).
+
+**Requisitos**
+
+```
+pip install openpyxl formulas
+```
+
+Sin `formulas` la auditoría estática sigue corriendo, pero ningún número queda
+verificado — y en ese caso la skill exige decirlo en vez de dejar que "auditado"
+implique "las cifras son correctas".
