@@ -98,3 +98,118 @@ una fórmula que referencie un rollup inexistente. Sigue este orden exacto:
 - Suscripciones normalizadas a coste mensual (anual ÷ 12, trimestral ÷ 3).
 - Gráfica de líneas de evolución de la inversión + 2 gráficas de anillo por medio de pago.
 - 7 botones que crean la transacción con `Tipo`, `Fecha` y vínculos ya rellenados.
+
+---
+
+## 🤖 Agentes de Claude Code en este repositorio
+
+Además del manual de Notion, este repositorio aloja agentes a nivel de proyecto
+(`.claude/agents/`) que Claude Code carga automáticamente al abrirlo.
+
+### Spreadsheet Systems Architect
+
+Modelo: **Opus** · Esfuerzo: **`xhigh` (UltraCode)** · Definición: [`.claude/agents/spreadsheet-systems-architect.md`](.claude/agents/spreadsheet-systems-architect.md)
+
+Especialista en **Reverse Engineering, Spreadsheet Engineering, Automation,
+Visual Reconstruction y Functional QA** para Excel y Google Sheets. Analiza una
+hoja de cálculo existente o una referencia visual, infiere su arquitectura y
+funcionalidades internas, la reconstruye, la automatiza cuando corresponde y
+ejecuta una batería de pruebas visuales y funcionales antes de darla por
+terminada.
+
+**Cuándo usarlo**
+
+- Reproducir un dashboard o plantilla a partir de una captura, PDF o mockup.
+- Auditar un modelo financiero: fórmulas, dependencias, errores y riesgos.
+- Reparar plantillas rotas explicando primero cómo funcionan por dentro.
+- Portar Excel ↔ Google Sheets conservando la lógica (VBA → Apps Script,
+  Power Query → `QUERY`/`IMPORTRANGE`).
+- Automatizar reportes recurrentes con fórmulas, Apps Script o Python.
+
+**Cómo invocarlo**
+
+```
+> usa el agente spreadsheet-systems-architect para reconstruir este dashboard
+```
+
+Claude Code también lo selecciona solo cuando la tarea encaja con su descripción.
+
+**Sobre el esfuerzo UltraCode**
+
+El agente declara `effort: xhigh` en su frontmatter, que es el nivel de
+razonamiento que UltraCode envía al modelo, y lo aplica solo mientras el agente
+está activo. `ultracode` no es un valor válido del campo `effort`: es un ajuste
+de sesión que suma a `xhigh` la orquestación automática de workflows dinámicos.
+Para tenerlo completo, actívalo en la sesión desde la que invocas al agente:
+
+```
+/effort ultracode          # toda la sesión
+claude --effort ultracode  # desde el arranque
+ultracode: <tu tarea>      # solo para esa tarea
+```
+
+Requiere un modelo con soporte de `xhigh` (Opus 5 / Opus 4.8), que es el caso de
+este agente. El propio prompt del agente incluye además la pauta de fan-out por
+hoja, por familia de fórmulas y por caso de prueba, que es la mitad de
+orquestación de UltraCode aplicada a hojas de cálculo.
+
+> 💡 Encaja de forma natural con este repositorio: es la contraparte en hoja de
+> cálculo del sistema de finanzas de Notion — exportar, auditar o replicar en
+> Excel/Sheets los mismos saldos, presupuestos y patrimonio neto.
+
+---
+
+## 🛠️ Skills de Claude Code en este repositorio
+
+### Precision Forge
+
+Esfuerzo: **`xhigh`** · Definición: [`.claude/skills/precision-forge/`](.claude/skills/precision-forge/)
+
+Skill de precisión quirúrgica para construir, reparar y auditar hojas de cálculo
+avanzadas de Excel. No revisa el trabajo al final: interpone un auditor mecánico
+entre cada bloque que se escribe y el siguiente, de modo que ningún defecto viaje
+más de una porción desde donde se introdujo.
+
+**El ciclo — seis puertas, cada una con feedback inmediato**
+
+| Puerta | Qué hace |
+|---|---|
+| 0 · Memoria | Lee el historial del proyecto: qué ha fallado antes, ordenado por frecuencia |
+| 1 · Validación de entrada | Tipos, claves, completitud y rango de los datos fuente |
+| 2 · Construcción por porciones | Auditoría estática tras cada bloque; bloquea si hay hallazgos graves |
+| 3 · Prueba numérica | Recalcula cada fórmula en Python puro y detecta valores obsoletos |
+| 4 · Golden test | Compara contra los valores que tú afirmas, derivados aparte |
+| 5 · Presentación | Barrido final: anchos, formatos, impresión, protección |
+| 6 · Cierre | Registra los hallazgos para que la próxima construcción empiece mejor |
+
+**Herramientas**
+
+- `scripts/audit.py` — 21 comprobaciones estáticas. La más incisiva normaliza
+  cada fórmula a forma relativa (R1C1), de modo que las celdas rellenadas desde
+  una misma fórmula colapsan en la misma cadena y la que se editó a mano queda
+  al descubierto. Devuelve código de salida para encadenarlo en un bucle de
+  construcción.
+- `scripts/recalc.py` — motor de cálculo en Python puro: no necesita Excel ni
+  LibreOffice. Detecta fórmulas que evalúan a error, valores guardados que ya no
+  coinciden con su propia fórmula, y desvíos contra expectativas declaradas.
+- `scripts/ledger.py` — la capa que aprende.
+
+**Cómo aprende**
+
+Un archivo de skill es texto estático y no puede reescribirse a sí mismo. El
+aprendizaje vive en `.precision-forge/ledger.json`, que el auditor lee en cada
+ejecución, y es real en tres sentidos verificables: **prioriza** (los hallazgos
+acumulan cuenta y ordenan la lista de vigilancia), **suprime** (un falso
+positivo silenciado con su motivo no vuelve a saltar, entre sesiones) y
+**extiende** (se pueden añadir comprobaciones nuevas que corren junto al
+catálogo de fábrica desde la siguiente auditoría).
+
+**Requisitos**
+
+```
+pip install openpyxl formulas
+```
+
+Sin `formulas` la auditoría estática sigue corriendo, pero ningún número queda
+verificado — y en ese caso la skill exige decirlo en vez de dejar que "auditado"
+implique "las cifras son correctas".
