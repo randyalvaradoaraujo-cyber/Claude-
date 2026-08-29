@@ -341,15 +341,25 @@ def c7_sin_errores(wb, valores):
           "errores: %s" % (malos[:12] or "ninguno"))
 
 
-def c8_grafica(wb):
-    graficas = []
-    for ws in wb.worksheets:
-        for g in getattr(ws, "_charts", []):
-            graficas.append("%s: %s con %d serie(s)"
-                            % (ws.title, type(g).__name__, len(getattr(g, "series", []))))
-    ok = any(g.startswith("Progreso") for g in graficas)
-    check("8. La gráfica existe en Progreso y apunta a series reales", ok,
-          "gráficas: %s" % (graficas or "ninguna"))
+def c8_grafica(wb, path):
+    """Cuenta las series en el XML, no en el modelo de openpyxl.
+
+    openpyxl recompone un gráfico combinado al releerlo y solo devuelve las
+    series del gráfico primario, así que su recuento subcuenta. La verdad de lo
+    que verá Excel está en el XML del gráfico.
+    """
+    import zipfile, re
+    series, refs = 0, []
+    with zipfile.ZipFile(path) as z:
+        for n in z.namelist():
+            if "charts/chart" in n and n.endswith(".xml"):
+                x = z.read(n).decode("utf-8")
+                series += x.count("<ser>")
+                refs += [r for r in re.findall(r"<f>([^<]+)</f>", x) if "$" in r]
+    hoja_ok = any("Progreso" in r for r in refs)
+    check("8. La gráfica tiene sus 3 series y apunta a rangos reales",
+          series == 3 and hoja_ok,
+          "%d serie(s); rangos: %s" % (series, refs))
 
 
 def main():
@@ -378,7 +388,7 @@ def main():
         ("5", lambda: c5_semilla(wb, valores)),
         ("6", lambda: c6_borrar_sesion1(path)),
         ("7", lambda: c7_sin_errores(wb, valores)),
-        ("8", lambda: c8_grafica(wb)),
+        ("8", lambda: c8_grafica(wb, path)),
     ):
         try:
             fn()
