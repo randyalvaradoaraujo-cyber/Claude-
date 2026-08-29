@@ -113,15 +113,36 @@ def fila_valores(ws, celda_rotulo, valores):
     return out
 
 
+def valor(valores, ws, celda):
+    """Valor calculado de la celda; si el motor no produjo nada, el literal.
+
+    `dict.get(k, default)` devuelve el None *almacenado*, no el default, así que
+    una celda que el motor no supo evaluar se leería como vacía y una fecha
+    literal parecería ausente. Aquí el literal gana cuando no hay cálculo.
+    """
+    v = valores.get("%s!%s" % (ws.title.upper(), celda.coordinate))
+    return celda.value if v is None else v
+
+
 def num(v):
     return v if isinstance(v, (int, float)) and not isinstance(v, bool) else None
 
 
 def fecha_txt(v):
+    """Normaliza a dd/mm/aaaa venga como venga.
+
+    El motor de cálculo devuelve las fechas como número de serie de Excel (días
+    desde 1899-12-30), mientras que openpyxl las devuelve ya como datetime. Sin
+    convertir el serial, una fecha correcta se leería como ausente.
+    """
     if isinstance(v, dt.datetime):
         return v.strftime("%d/%m/%Y")
     if isinstance(v, dt.date):
         return v.strftime("%d/%m/%Y")
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        if v <= 0:
+            return None
+        return (dt.datetime(1899, 12, 30) + dt.timedelta(days=float(v))).strftime("%d/%m/%Y")
     if isinstance(v, str) and v.strip():
         return v.strip()
     return None
@@ -269,7 +290,7 @@ def c5_semilla(wb, valores):
         for i, esperado in enumerate(fechas):
             c = ws.cell(fila, 2 + i)
             ref = "PROGRESO!%s" % c.coordinate
-            got = fecha_txt(valores.get(ref, c.value))
+            got = fecha_txt(valor(valores, ws, c))
             if esperado is None:
                 continue
             if got != esperado:
