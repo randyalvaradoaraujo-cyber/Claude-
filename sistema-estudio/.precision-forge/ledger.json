@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "created_at": "2026-08-28T18:51:08+00:00",
+  "updated_at": "2026-08-29T01:36:52+00:00",
+  "patterns": {
+    "MEJORA_AUDITOR": {
+      "check": "MEJORA_AUDITOR",
+      "severity": "",
+      "occurrences": 0,
+      "first_seen": "2026-08-29T01:36:52+00:00",
+      "last_seen": "2026-08-29T01:36:52+00:00",
+      "examples": [],
+      "note": "El escaneo por filas deberia tratar una celda de entrada no-formula a la cabeza de una fila derivada igual que trata una cabecera al inicio de una columna calculada"
+    }
+  },
+  "muted": {
+    "CONSTANT_IN_FORMULA_RUN::=IF(R[0]C2=\"@\",\"@\",IF(R[0]C[15]<>\"@\",R[0]C[15],(R[0]C[-1]+INDEX(INTERVALOS,COLUMN()-COLUMN(R1C2)))+INDEX(DESPLAZAMIENTO,WEEKDAY(R[0]C[-1]+INDEX(INTERVALOS,COLUMN()-COLUMN(R1C2)),2))))": {
+      "reason": "Sesion 1 es entrada manual del usuario por diseno: celda de entrada a la cabeza de una fila derivada, no un valor pegado",
+      "muted_at": "2026-08-29T01:36:52+00:00"
+    },
+    "VOLATILE::TODAY": {
+      "reason": "Unica celda de fecha de hoy en Calendario; el semaforo la exige y el catalogo la admite como excepcion documentada",
+      "muted_at": "2026-08-29T01:36:52+00:00"
+    }
+  },
+  "rules": {},
+  "stats": {
+    "runs": 0,
+    "findings_total": 0,
+    "by_check": {}
+  }
+}
