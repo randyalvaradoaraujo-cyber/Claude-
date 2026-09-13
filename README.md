@@ -17,6 +17,12 @@ rollups** que recalcula el patrimonio neto en tiempo real, **7 botones de alta r
 | **[DATOS-DE-PRUEBA.md](DATOS-DE-PRUEBA.md)** | Juego de datos semilla que reproduce exactamente los números del diseño original + checklist de verificación. |
 | **[IDS-NOTION.md](IDS-NOTION.md)** | Mapa de IDs de la instancia ya construida en Notion + limitaciones reales de la API de Notion verificadas durante el montaje. |
 
+### Otros sistemas del mismo workspace
+
+| Archivo | Qué contiene |
+|---|---|
+| **[BIBLIOTECA-LIBROS.md](BIBLIOTECA-LIBROS.md)** | Biblioteca Digital (`Apuntes libro` y `Biografías`): por qué un libro nuevo salía en blanco, qué se arregló por API y los dos pasos manuales que la API de Notion no permite automatizar. |
+
 ---
 
 ## 🧠 Los 5 principios de arquitectura del sistema
