@@ -88,6 +88,44 @@ plantilla y volverás al comportamiento anterior (`📎 Portada · Vacío`).
 
 ---
 
+## 📖 Los libros que ya existían
+
+Los cuatro libros reales **ya tenían** los tres desplegables — se crearon cuando la plantilla sí se
+aplicaba. Lo único que les faltaba era la portada: tenían la foto del libro puesta como **cubierta
+de página** (la imagen de cabecera) pero la propiedad `Portada` estaba vacía, así que salía la fila
+`📎 Portada · Vacío`.
+
+Se copió la foto de cada uno desde su cubierta de página a su propiedad `Portada`, de modo que ahora
+aparece el recuadro de galería con su propia foto, no un marcador genérico.
+
+| Libro | Base de datos | Page ID | Estado |
+|---|---|---|---|
+| Piense Y Hágase Rico | Apuntes libro | `3c2bcf9f-3ec3-8003-a1ea-f2da4a8720f3` | ✅ Desplegables + portada propia |
+| Libro Padre Rico, Padre Pobre | Apuntes libro | `3c2bcf9f-3ec3-803f-afbb-f55541be0ae8` | ✅ Desplegables + portada propia |
+| Biblia Rvr1960 Manual León | Apuntes libro | `3c2bcf9f-3ec3-808d-a289-fb6d23baa1b1` | ✅ Desplegables + portada propia |
+| Elon Musk - Ashlee Vance | Biografías | `3c2bcf9f-3ec3-80b4-b91e-f819610c9442` | ✅ Desplegables + portada propia |
+
+Les sigue faltando **solo el botón** `+ Añadir anotación`, que hay que pegar a mano (paso 2.A): las
+plantillas no afectan a las páginas ya creadas.
+
+### Las 7 páginas en blanco
+
+Además de esos cuatro libros hay **7 páginas sin título y completamente vacías**, todas creadas hoy
+al probar el `+` cuando todavía no había plantilla predeterminada. Son el síntoma del fallo, no
+libros:
+
+| Base de datos | Page IDs |
+|---|---|
+| Apuntes libro | `3dabcf9f-3ec3-80c4-95e1-e81adb26d0a8`, `3dabcf9f-3ec3-802c-a0aa-cf64016dce06`, `3dabcf9f-3ec3-801e-916e-d22a9dbb0e65` |
+| Biografías | `3dabcf9f-3ec3-80ba-953a-eb1625f2cfec`, `3dabcf9f-3ec3-803a-85c1-ff6c1f4b27d9`, `3dabcf9f-3ec3-8053-823a-d9b7cbddc6ba`, `3dabcf9f-3ec3-803e-9062-fcfd2e70e425` |
+
+**No se pudieron rellenar por API**: para dejarlas como un libro de verdad haría falta recrear la
+vista enlazada de `Citas` dentro del desplegable, y la API la rechaza (ver limitaciones). Lo
+sensato es **borrarlas** y, con la plantilla ya marcada como predeterminada, volver a crearlas con
+el `+`: salen perfectas de una sola vez.
+
+---
+
 ## ✋ Los dos pasos que hay que dar a mano (una sola vez)
 
 La API de Notion **no expone** ninguna de estas dos cosas. Verificado, no es una suposición:
@@ -165,10 +203,19 @@ Se suman a los ya documentados en [IDS-NOTION.md](IDS-NOTION.md).
 |---|---|---|
 | **Plantilla predeterminada** de una BD | Ni `update-data-source` (solo acepta DDL de esquema) ni el DSL de `update-view` tienen directiva para ello | A mano: `⌄` → `···` → `Establecer como predeterminada` |
 | **Bloques de tipo Botón** | No están en la especificación de Markdown de Notion; se leen como `<unknown alt="button"/>` | A mano, o copiar y pegar uno existente |
+| **Vista enlazada** de la BD `Citas` dentro de una página | `<database data-source-url="…">` devuelve `Data source not found`, aunque `fetch` sí lee esa data source | Crear la página desde la plantilla (Notion la genera nativamente) |
 | Subida directa de ficheros a `api.notion.com` | El proxy de salida del entorno la bloquea por política (`403 CONNECT`) | Usar `create-attachment` del MCP, que sube desde el servidor de Notion |
+
+Sobre la vista enlazada se probaron tres sintaxis, todas rechazadas:
+`collection://<id>`, `{{collection://<id>}}` (→ `Data source not found`) y la URL de página de la
+data source (→ `Invalid agent URL`). Los errores son atómicos: ninguna dejó contenido a medias.
 
 ### Lo que sí funcionó
 
 - Leer el esquema completo, las plantillas y su marca `default` de cada data source.
 - Escribir una propiedad de tipo **archivo** con un `file_upload` creado por `create-attachment`.
 - Subir un SVG generado como texto plano (862 bytes) sin salir a la red desde el contenedor.
+- **Mover la cubierta de página a la propiedad `Portada`**: la URL firmada de S3 que devuelve
+  `fetch` en el campo `cover` sirve como `source_url` de `create-attachment`, porque quien la
+  descarga es el servidor de Notion y no el contenedor. Caduca a los 5 minutos, así que hay que
+  encadenar `fetch` → `create-attachment` → `update-page` sin pausas.
