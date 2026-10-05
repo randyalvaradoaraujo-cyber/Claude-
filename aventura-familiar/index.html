@@ -25,7 +25,10 @@
       -webkit-tap-highlight-color: transparent;
     }
     canvas {
-      display: block; position: fixed; left: 0; top: 0;
+      display: block; position: fixed; left: 0;
+      top: env(safe-area-inset-top, 0px);
+      width: 100%;
+      height: calc(100% - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
       image-rendering: pixelated; image-rendering: crisp-edges;
       touch-action: none; outline: none;
     }

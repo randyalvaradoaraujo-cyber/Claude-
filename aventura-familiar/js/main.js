@@ -25,17 +25,18 @@ const App = {
   },
 };
 
+// El lienzo ocupa la pantalla menos las zonas seguras (muesca, barras);
+// la resolución interna mantiene unos 270 px en el lado corto.
 function ajustarPantalla() {
   const cv = App.lienzo;
-  const cw = window.innerWidth, ch = window.innerHeight;
+  const r = cv.getBoundingClientRect();
+  const cw = r.width || window.innerWidth, ch = r.height || window.innerHeight;
   const corto = Math.max(1, Math.min(cw, ch));
   const esc = corto / 270;
   App.W = Math.max(200, Math.round(cw / esc));
   App.H = Math.max(200, Math.round(ch / esc));
   cv.width = App.W;
   cv.height = App.H;
-  cv.style.width = cw + 'px';
-  cv.style.height = ch + 'px';
   App.g.imageSmoothingEnabled = false;
   Entrada.W = App.W;
   Entrada.H = App.H;
