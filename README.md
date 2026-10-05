@@ -22,6 +22,7 @@ rollups** que recalcula el patrimonio neto en tiempo real, **7 botones de alta r
 | Archivo | Qué contiene |
 |---|---|
 | **[BIBLIOTECA-LIBROS.md](BIBLIOTECA-LIBROS.md)** | Biblioteca Digital (`Apuntes libro` y `Biografías`): por qué un libro nuevo salía en blanco, qué se arregló por API y los dos pasos manuales que la API de Notion no permite automatizar. |
+| **[aventura-familiar/](aventura-familiar/README.md)** | *Aventura Familiar*: videojuego de plataformas pixel-art para móviles (HTML5, se instala como app y funciona sin internet). |
 
 ---
 
