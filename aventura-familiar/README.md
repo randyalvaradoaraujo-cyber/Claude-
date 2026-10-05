@@ -30,6 +30,12 @@ El juego es una página web (HTML5). No necesita instalación ni tienda de aplic
 Para probarlo en la computadora: `npx http-server aventura-familiar` y abre
 `http://localhost:8080`.
 
+### Versión de un solo archivo
+
+`node aventura-familiar/herramientas/empaquetar.js` crea `aventura-familiar.html`, con
+todos los scripts e imágenes adentro. Ese archivo se puede pasar al teléfono (WhatsApp,
+correo, Drive o cable) y abrirlo directamente en el navegador, sin servidor ni internet.
+
 ### Convertirlo en APK de Android (opcional)
 
 Con [Capacitor](https://capacitorjs.com/) y Android Studio instalados:
@@ -94,7 +100,8 @@ aventura-familiar/
 ├── assets/                 recortes de las imágenes originales e íconos
 ├── capturas/               capturas para este documento
 ├── herramientas/
-│   └── validar-niveles.js  revisa que los mapas se puedan completar
+│   ├── validar-niveles.js  revisa que los mapas se puedan completar
+│   └── empaquetar.js       arma la versión de un solo archivo HTML
 └── js/
     ├── motor.js      utilidades, fuente pixel, controles, audio y guardado
     ├── arte.js       sprites, casillas y fondos generados por código
